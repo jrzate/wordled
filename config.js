@@ -11,7 +11,7 @@ const CONFIG = {
 
   // "random" = each player gets a random word from the pool
   // "daily"  = everyone gets the same word, changing each day
-  wordMode: "daily",
+  wordMode: "random",
 
   winMessages: ["Brilliant!","Wonderful!","Splendid!","Great!","Nice!","Phew!"],
 
