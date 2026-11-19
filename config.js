@@ -27,7 +27,7 @@ const CONFIG = {
   // Keys name, email and contact are saved to the sheet's columns.
   entryFields: [
     {key:"name",    label:"Name",  type:"text",  required:true},
-    {key:"email",   label:"Email", type:"email", required:true},
+    {key:"email",   label:"UP Mail", type:"email", required:true},
     {key:"contact", label:"Phone or social handle (optional)", type:"text", required:false}
   ]
 };
