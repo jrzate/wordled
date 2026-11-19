@@ -18,7 +18,7 @@ const CONFIG = {
   // ---- Prize draw ----
   // Paste your Google Apps Script web app URL here (see README.md, Part 1).
   // Leave it empty and the entry form shows "not set up yet".
-  entryEndpoint: "",
+  entryEndpoint: "https://script.google.com/macros/s/AKfycbzvBC9XsVxKm3EUYn0MC_lYvHXyGLsG2hR8KugVrUoRrroaEokKMztgontIA7UfC1ELDQ/exec",
 
   entryTabLabel: "Lantern Draw",
   entryTitle: "You found the light!",
