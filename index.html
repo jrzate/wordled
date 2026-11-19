@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wordled</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* ===== THEME: edit these colors to re-skin the game ===== */
+:root{
+  --bg1:#1d1442; --bg2:#4a2a7a;
+  --tile-empty:rgba(255,255,255,.06);
+  --tile-border:#5b4a8f;
+  --tile-border-filled:#a99ad6;
+  --correct:#f2b632;
+  --present:#9b6fd6;
+  --absent:#2b2350;
+  --text:#fff6dc;
+  --key:#43357a;
+  --title-font:"Cormorant Garamond",Georgia,serif;
+  --body-font:"Nunito",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,var(--bg2),var(--bg1) 70%) fixed;background-color:var(--bg1);color:var(--text);font-family:var(--body-font);display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+.stars{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 20% 30%,#fff8,transparent),radial-gradient(1.5px 1.5px at 70% 20%,#fff8,transparent),radial-gradient(1px 1px at 40% 70%,#fff6,transparent),radial-gradient(1.5px 1.5px at 85% 60%,#fff8,transparent),radial-gradient(1px 1px at 10% 80%,#fff6,transparent)}
+header,nav,#play,#welcome,#entry{position:relative}
+header{text-align:center;padding:14px 12px 4px}
+.sun{width:44px;height:44px;color:var(--correct);filter:drop-shadow(0 0 8px var(--correct))}
+h1{font-family:var(--title-font);font-size:2.1rem;margin:0;letter-spacing:.04em;color:var(--correct)}
+nav{display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;justify-content:center}
+.tab{background:transparent;color:var(--text);border:2px solid var(--tile-border);border-radius:999px;padding:7px 16px;font:800 .9rem var(--body-font);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--correct);border-color:var(--correct);color:#1d1442}
+.tab:focus-visible,.btn:focus-visible,.key:focus-visible{outline:3px solid var(--correct);outline-offset:2px}
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg1);padding:10px 16px;border-radius:8px;font-weight:800;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5;text-align:center}
+#toast.show{opacity:1}
+#play{display:flex;flex-direction:column;align-items:center;width:100%}
+#board{display:grid;gap:6px;margin:14px 0}
+.row{display:grid;gap:6px}
+.tile{width:clamp(48px,14vw,62px);aspect-ratio:1;border:2px solid var(--tile-border);background:var(--tile-empty);display:grid;place-items:center;font-size:1.9rem;font-weight:800;text-transform:uppercase;border-radius:6px}
+.tile.filled{border-color:var(--tile-border-filled);animation:pop .1s}
+.tile.correct,.tile.present,.tile.absent{border-color:transparent;color:#1d1442;animation:flip .5s both}
+.tile.correct{background:var(--correct)}
+.tile.present{background:var(--present);color:#fff}
+.tile.absent{background:var(--absent);color:var(--text);opacity:.9}
+.row.shake{animation:shake .4s}
+@keyframes pop{50%{transform:scale(1.1)}}
+@keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#kb{width:min(500px,100%);padding:0 6px 16px;display:flex;flex-direction:column;gap:6px}
+.krow{display:flex;gap:5px;justify-content:center}
+.key{flex:1;max-width:44px;height:54px;border:0;border-radius:6px;background:var(--key);color:var(--text);font:800 .95rem var(--body-font);cursor:pointer;text-transform:uppercase;padding:0}
+.key.wide{max-width:66px;font-size:.75rem}
+.key.correct{background:var(--correct);color:#1d1442}
+.key.present{background:var(--present)}
+.key.absent{background:var(--absent);opacity:.7}
+.btn{background:var(--correct);color:#1d1442;border:0;border-radius:999px;padding:10px 20px;font:800 1rem var(--body-font);cursor:pointer}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+#end{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:56px}
+#welcome,#entry{width:min(480px,100%);padding:8px 16px 32px}
+#welcome h2,#entry h2{font-family:var(--title-font);color:var(--correct);margin:8px 0 4px;font-size:1.7rem}
+#welcome p,#welcome li,#entry p{line-height:1.5}
+#welcome ul{padding-left:20px;margin:8px 0 14px}
+.ex{display:flex;gap:5px;margin:6px 0 4px}
+.ex .tile{width:38px;font-size:1.3rem;animation:none!important}
+.card{background:rgba(29,20,66,.7);border:1px solid var(--tile-border);border-radius:12px;padding:16px;margin:12px 0}
+.field{display:block;margin-bottom:12px;font-weight:800;font-size:.9rem}
+.field input{display:block;width:100%;margin-top:4px;padding:10px;border-radius:8px;border:2px solid var(--tile-border);background:rgba(255,255,255,.08);color:var(--text);font:600 1rem var(--body-font)}
+.field input:focus{outline:3px solid var(--correct);border-color:transparent}
+.msg{min-height:1.4em;font-weight:800;margin-top:10px}
+.err{color:#ffb4b4}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<header>
+  <svg class="sun" viewBox="0 0 100 100" aria-hidden="true"><g fill="currentColor"><circle cx="50" cy="50" r="14"/><path d="M50 6l6 24h-12zM50 94l-6-24h12zM6 50l24-6v12zM94 50l-24 6v-12zM19 19l22 12-10 10zM81 81l-22-12 10-10zM81 19l-12 22-10-10zM19 81l12-22 10 10z"/></g></svg>
+  <h1 id="title"></h1>
+</header>
+<nav role="tablist">
+  <button class="tab" id="tabWelcome" role="tab" aria-selected="true">How to play</button>
+  <button class="tab" id="tabPlay" role="tab" aria-selected="false">Play</button>
+  <button class="tab" id="tabEntry" role="tab" aria-selected="false" hidden></button>
+</nav>
+<div id="toast" role="status"></div>
+
+<section id="welcome">
+  <h2>Welcome to the tower</h2>
+  <p>Guess the hidden word in 6 tries.</p>
+  <ul>
+    <li>Each guess must be a 5-letter word. Press Enter to submit.</li>
+    <li>After each guess, the tiles change color to show how close you are.</li>
+    <li id="modeNote"></li>
+  </ul>
+  <p><strong>Examples</strong></p>
+  <div class="ex"><div class="tile correct">T</div><div class="tile">O</div><div class="tile">W</div><div class="tile">E</div><div class="tile">R</div></div>
+  <p>T is in the word and in the right spot (gold).</p>
+  <div class="ex"><div class="tile">B</div><div class="tile">R</div><div class="tile present">A</div><div class="tile">I</div><div class="tile">D</div></div>
+  <p>A is in the word but in the wrong spot (purple).</p>
+  <div class="ex"><div class="tile">F</div><div class="tile">L</div><div class="tile">A</div><div class="tile absent">M</div><div class="tile">E</div></div>
+  <p>M is not in the word at all (dark).</p>
+  <p>Letters can repeat. A letter is only colored as many times as it appears in the word.</p>
+  <p>Find the word and a new tab opens where you can enter the prize draw. You can also share your result as colored squares.</p>
+  <button class="btn" id="startBtn">Start playing</button>
+</section>
+
+<div id="play" hidden>
+  <main id="board" aria-label="Game board"></main>
+  <div id="end"></div>
+  <div id="kb"></div>
+</div>
+
+<section id="entry" hidden>
+  <h2 id="entryTitle"></h2>
+  <p id="entryIntro"></p>
+  <div class="card">
+    <div id="entryFields"></div>
+    <p id="consent" style="font-size:.8rem"></p>
+    <button class="btn" id="entrySubmit">Enter the draw</button>
+    <div class="msg" id="entryMsg" role="status"></div>
+  </div>
+</section>
+
+<script src="config.js"></script>
+<script>
+const L = CONFIG.wordLength, N = CONFIG.maxGuesses;
+const WORDS = CONFIG.words.map(w => w.toUpperCase()).filter(w => w.length === L);
+const $ = id => document.getElementById(id);
+let secret, row, col, grid, over, colors, shareRows = [];
+
+/* ---------- setup ---------- */
+document.title = CONFIG.title;
+$("title").textContent = CONFIG.title;
+$("tabEntry").textContent = CONFIG.entryTabLabel;
+$("entryTitle").textContent = CONFIG.entryTitle;
+$("entryIntro").textContent = CONFIG.entryIntro;
+$("consent").textContent = CONFIG.consent;
+$("modeNote").textContent = CONFIG.wordMode === "daily"
+  ? "There is a new word every day."
+  : "Each player gets a random word from a pool of " + WORDS.length + " hidden words.";
+
+function pickWord(random){
+  if (CONFIG.wordMode === "daily" && !random) return WORDS[Math.floor(Date.now() / 864e5) % WORDS.length];
+  return WORDS[Math.floor(Math.random() * WORDS.length)];
+}
+function toast(msg, ms = 1500){
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), ms);
+}
+
+/* ---------- tabs ---------- */
+function showTab(t){
+  ["welcome","play","entry"].forEach(n => $(n).hidden = n !== t);
+  $("tabWelcome").setAttribute("aria-selected", String(t === "welcome"));
+  $("tabPlay").setAttribute("aria-selected", String(t === "play"));
+  $("tabEntry").setAttribute("aria-selected", String(t === "entry"));
+}
+$("tabWelcome").onclick = () => showTab("welcome");
+$("startBtn").onclick = () => showTab("play");
+$("tabPlay").onclick = () => showTab("play");
+$("tabEntry").onclick = () => showTab("entry");
+
+/* ---------- board ---------- */
+function build(){
+  const b = $("board"); b.innerHTML = "";
+  for (let r = 0; r < N; r++){
+    const rowEl = document.createElement("div");
+    rowEl.className = "row"; rowEl.style.gridTemplateColumns = `repeat(${L},auto)`;
+    for (let c = 0; c < L; c++){ const t = document.createElement("div"); t.className = "tile"; rowEl.appendChild(t); }
+    b.appendChild(rowEl);
+  }
+  const kb = $("kb"); kb.innerHTML = "";
+  ["QWERTYUIOP","ASDFGHJKL","ZXCVBNM"].forEach((letters, i) => {
+    const r = document.createElement("div"); r.className = "krow";
+    if (i === 2) r.appendChild(mkKey("ENTER","Enter",true));
+    for (const ch of letters) r.appendChild(mkKey(ch, ch));
+    if (i === 2) r.appendChild(mkKey("\u232B","Backspace",true));
+    kb.appendChild(r);
+  });
+}
+function mkKey(label, val, wide){
+  const k = document.createElement("button");
+  k.className = "key" + (wide ? " wide" : ""); k.textContent = label; k.dataset.k = val;
+  k.setAttribute("aria-label", val); k.onclick = () => handle(val);
+  return k;
+}
+function newGame(random){
+  secret = pickWord(random); row = 0; col = 0; over = false;
+  grid = Array.from({length:N}, () => Array(L).fill(""));
+  colors = {}; shareRows = []; build(); $("end").innerHTML = "";
+}
+const tile = (r, c) => $("board").children[r].children[c];
+
+function handle(k){
+  if (over) return;
+  if (k === "Enter") return submit();
+  if (k === "Backspace"){
+    if (col > 0){ col--; grid[row][col] = ""; const t = tile(row,col); t.textContent = ""; t.classList.remove("filled"); }
+    return;
+  }
+  if (/^[a-zA-Z]$/.test(k) && col < L){
+    grid[row][col] = k.toUpperCase();
+    const t = tile(row,col); t.textContent = k.toUpperCase(); t.classList.add("filled"); col++;
+  }
+}
+function score(guess){
+  const res = Array(L).fill("absent"), pool = {};
+  for (let i = 0; i < L; i++){
+    if (guess[i] === secret[i]) res[i] = "correct";
+    else pool[secret[i]] = (pool[secret[i]] || 0) + 1;
+  }
+  for (let i = 0; i < L; i++){
+    if (res[i] === "correct") continue;
+    if (pool[guess[i]] > 0){ res[i] = "present"; pool[guess[i]]--; }
+  }
+  return res;
+}
+function submit(){
+  if (col < L){
+    toast("Not enough letters");
+    const r = $("board").children[row]; r.classList.add("shake"); setTimeout(() => r.classList.remove("shake"), 400);
+    return;
+  }
+  const guess = grid[row].join(""), res = score(guess), rank = {absent:0, present:1, correct:2};
+  res.forEach((s, i) => {
+    const t = tile(row, i); t.style.animationDelay = (i * 0.25) + "s"; t.classList.add(s);
+    const ch = guess[i]; if (!colors[ch] || rank[s] > rank[colors[ch]]) colors[ch] = s;
+  });
+  shareRows.push(res);
+  const hasWon = guess === secret, done = hasWon || row === N - 1, thisRow = row;
+  over = done; row++; col = 0;
+  setTimeout(() => {
+    document.querySelectorAll(".key").forEach(k => {
+      const s = colors[k.dataset.k]; if (s) k.className = "key" + (k.classList.contains("wide") ? " wide " : " ") + s;
+    });
+    if (!done) return;
+    toast(hasWon ? CONFIG.winMessages[thisRow % CONFIG.winMessages.length] : secret, 4000);
+    const end = $("end"); end.innerHTML = "";
+    const add = (label, fn) => { const b = document.createElement("button"); b.className = "btn"; b.textContent = label; b.onclick = fn; end.appendChild(b); };
+    if (hasWon){ $("tabEntry").hidden = false; add("Enter the lantern draw", () => showTab("entry")); }
+    add("Share results", shareResults);
+    add("Play again", () => newGame(true));
+  }, L * 250 + 300);
+}
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || $("play").hidden) return;
+  if (e.key === "Enter" && document.activeElement.tagName === "BUTTON") return;
+  if (e.key === "Enter" || e.key === "Backspace" || /^[a-zA-Z]$/.test(e.key)) handle(e.key);
+});
+
+/* ---------- share results as emoji squares ---------- */
+function shareText(){
+  const m = {correct:"\uD83D\uDFE8", present:"\uD83D\uDFEA", absent:"\u2B1B"};
+  const last = shareRows[shareRows.length - 1];
+  const sc = last && last.every(s => s === "correct") ? shareRows.length : "X";
+  return CONFIG.title + " " + sc + "/" + N + "\n\n" + shareRows.map(r => r.map(s => m[s]).join("")).join("\n");
+}
+async function shareResults(){
+  const text = shareText();
+  try { if (navigator.share){ await navigator.share({text}); return; } }
+  catch (e){ if (e && e.name === "AbortError") return; }
+  try { await navigator.clipboard.writeText(text); toast("Results copied"); }
+  catch (e){
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (_){}
+    ta.remove(); toast(ok ? "Results copied" : "Couldn't copy results");
+  }
+}
+
+/* ---------- prize draw entry (saved to your Google Sheet) ---------- */
+CONFIG.entryFields.forEach(f => {
+  const l = document.createElement("label"); l.className = "field"; l.textContent = f.label;
+  const i = document.createElement("input"); i.type = f.type; i.id = "f_" + f.key; i.maxLength = 120;
+  l.appendChild(i); $("entryFields").appendChild(l);
+});
+function msg(t, bad){ const m = $("entryMsg"); m.textContent = t; m.className = "msg" + (bad ? " err" : ""); }
+function lockEntry(){ $("entrySubmit").disabled = true; msg("You're in! Good luck. We'll contact you if you win."); }
+try { if (localStorage.getItem("wordled-entered")) lockEntry(); } catch (e){}
+
+$("entrySubmit").onclick = async () => {
+  if (!CONFIG.entryEndpoint){ msg("The prize draw isn't set up yet.", true); return; }
+  const data = {};
+  for (const f of CONFIG.entryFields){
+    const v = $("f_" + f.key).value.trim();
+    if (f.required && !v){ msg("Please fill in: " + f.label, true); return; }
+    if (f.type === "email" && v && !/^\S+@\S+\.\S+$/.test(v)){ msg("Enter a valid email address.", true); return; }
+    data[f.key] = v;
+  }
+  data.word = secret;
+  $("entrySubmit").disabled = true; msg("Saving...");
+  try {
+    const r = await fetch(CONFIG.entryEndpoint, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data)});
+    const j = await r.json();
+    if (j.ok){ try { localStorage.setItem("wordled-entered","1"); } catch (e){} lockEntry(); }
+    else if (j.duplicate){ $("entrySubmit").disabled = false; msg("This email has already entered.", true); }
+    else throw new Error("save failed");
+  } catch (e){
+    $("entrySubmit").disabled = false; msg("Couldn't save your entry. Please try again.", true);
+  }
+};
+
+newGame(false);
+</script>
+</body>
+</html>
