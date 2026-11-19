@@ -7,11 +7,11 @@ const CONFIG = {
   maxGuesses: 6,
 
   // Word pool. Every word must have exactly `wordLength` letters.
-  words: ["TOWER","BRAID","SPARK","DREAM","FLAME","LIGHT","CROWN","MAGIC","PETAL","BLOOM"],
+  words: ["SPARK","DREAM","LIGHT","CROWN","MAGIC","PETAL","BLOOM", "FIFTY"],
 
   // "random" = each player gets a random word from the pool
   // "daily"  = everyone gets the same word, changing each day
-  wordMode: "random",
+  wordMode: "daily",
 
   winMessages: ["Brilliant!","Wonderful!","Splendid!","Great!","Nice!","Phew!"],
 
