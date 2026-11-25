@@ -7,7 +7,7 @@ const CONFIG = {
   maxGuesses: 6,
 
   // Word pool. Every word must have exactly `wordLength` letters.
-  words: ["SPARK","DREAM","LIGHT","CROWN","MAGIC","PETAL","BLOOM", "FIFTY"],
+  words: ["SPARK","DREAM","LIGHT","CROWN","MAGIC","PETAL","BLOOM", "FIFTY", "PAFTB"],
 
   // "random" = each player gets a random word from the pool
   // "daily"  = everyone gets the same word, changing each day
@@ -28,6 +28,6 @@ const CONFIG = {
   entryFields: [
     {key:"name",    label:"Name",  type:"text",  required:true},
     {key:"email",   label:"UP Mail", type:"email", required:true},
-    {key:"contact", label:"Phone or social handle (optional)", type:"text", required:false}
+    {key:"contact", label:"FB Name or IG handle", type:"text", required:true}
   ]
 };
