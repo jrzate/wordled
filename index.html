@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Wordled</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Nunito:wght@600;800&display=swap">
 <style>
@@ -21,20 +20,23 @@
   --title-font:"Cormorant Garamond",Georgia,serif;
   --body-font:"Nunito",system-ui,sans-serif;
   color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,var(--bg2),var(--bg1) 70%) fixed;background-color:var(--bg1);color:var(--text);font-family:var(--body-font);display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
 .stars{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 20% 30%,#fff8,transparent),radial-gradient(1.5px 1.5px at 70% 20%,#fff8,transparent),radial-gradient(1px 1px at 40% 70%,#fff6,transparent),radial-gradient(1.5px 1.5px at 85% 60%,#fff8,transparent),radial-gradient(1px 1px at 10% 80%,#fff6,transparent)}
-header,nav,#play,#welcome,#entry{position:relative}
+header,nav,#play,#welcome{position:relative}
 header{text-align:center;padding:14px 12px 4px}
 .sun{width:44px;height:44px;color:var(--correct);filter:drop-shadow(0 0 8px var(--correct))}
 h1{font-family:var(--title-font);font-size:2.1rem;margin:0;letter-spacing:.04em;color:var(--correct)}
-nav{display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;justify-content:center}
+nav{display:flex;gap:8px;margin:6px 0;justify-content:center}
 .tab{background:transparent;color:var(--text);border:2px solid var(--tile-border);border-radius:999px;padding:7px 16px;font:800 .9rem var(--body-font);cursor:pointer}
 .tab[aria-selected="true"]{background:var(--correct);border-color:var(--correct);color:#1d1442}
 .tab:focus-visible,.btn:focus-visible,.key:focus-visible{outline:3px solid var(--correct);outline-offset:2px}
-#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg1);padding:10px 16px;border-radius:8px;font-weight:800;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5;text-align:center}
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg1);padding:10px 16px;border-radius:8px;font-weight:800;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;text-align:center;max-width:90vw}
 #toast.show{opacity:1}
 #play{display:flex;flex-direction:column;align-items:center;width:100%}
 #board{display:grid;gap:6px;margin:14px 0}
@@ -56,21 +58,32 @@ nav{display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;justify-content:center}
 .key.correct{background:var(--correct);color:#1d1442}
 .key.present{background:var(--present)}
 .key.absent{background:var(--absent);opacity:.7}
-.btn{background:var(--correct);color:#1d1442;border:0;border-radius:999px;padding:10px 20px;font:800 1rem var(--body-font);cursor:pointer}
+.btn{display:inline-block;background:var(--correct);color:#1d1442;border:2px solid var(--correct);border-radius:999px;padding:9px 18px;font:800 1rem var(--body-font);cursor:pointer;text-align:center}
+.btn.alt{background:transparent;color:var(--text);border-color:var(--tile-border)}
 .btn:disabled{opacity:.6;cursor:not-allowed}
-#end{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:56px}
-#welcome,#entry{width:min(480px,100%);padding:8px 16px 32px}
-#welcome h2,#entry h2{font-family:var(--title-font);color:var(--correct);margin:8px 0 4px;font-size:1.7rem}
-#welcome p,#welcome li,#entry p{line-height:1.5}
+#end{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px}
+#welcome{width:min(480px,100%);padding:8px 16px 32px}
+#welcome h2,.entry h2{font-family:var(--title-font);color:var(--correct);margin:0 0 4px;font-size:1.7rem}
+#welcome h2{margin-top:8px}
+#welcome p,#welcome li,.entry p{line-height:1.5}
 #welcome ul{padding-left:20px;margin:8px 0 14px}
 .ex{display:flex;gap:5px;margin:6px 0 4px}
 .ex .tile{width:38px;font-size:1.3rem;animation:none!important}
-.card{background:rgba(29,20,66,.7);border:1px solid var(--tile-border);border-radius:12px;padding:16px;margin:12px 0}
+.card{background:rgba(29,20,66,.85);border:1px solid var(--tile-border);border-radius:12px;padding:16px}
+.entry{width:min(460px,92vw);margin:8px 0 16px}
+.entry p{margin:4px 0 12px}
 .field{display:block;margin-bottom:12px;font-weight:800;font-size:.9rem}
 .field input{display:block;width:100%;margin-top:4px;padding:10px;border-radius:8px;border:2px solid var(--tile-border);background:rgba(255,255,255,.08);color:var(--text);font:600 1rem var(--body-font)}
 .field input:focus{outline:3px solid var(--correct);border-color:transparent}
 .msg{min-height:1.4em;font-weight:800;margin-top:10px}
 .err{color:#ffb4b4}
+.overlay{position:fixed;inset:0;background:rgba(10,6,30,.82);display:grid;place-items:center;z-index:10;padding:12px}
+.sheet{background:var(--bg1);border:1px solid var(--tile-border);border-radius:16px;padding:16px;width:min(460px,100%);max-height:96vh;overflow:auto;text-align:center}
+.sheet h2{font-family:var(--title-font);color:var(--correct);margin:0 0 10px}
+.chk{display:inline-block;max-width:100%;border-radius:8px;background:repeating-conic-gradient(#4a4a5a 0 25%,#6a6a7a 0 50%) 0 0/20px 20px}
+#igCanvas{display:block;max-width:100%;max-height:46vh;width:auto;height:auto}
+.hint{font-size:.85rem;opacity:.85;margin:10px 0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -83,7 +96,6 @@ nav{display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;justify-content:center}
 <nav role="tablist">
   <button class="tab" id="tabWelcome" role="tab" aria-selected="true">How to play</button>
   <button class="tab" id="tabPlay" role="tab" aria-selected="false">Play</button>
-  <button class="tab" id="tabEntry" role="tab" aria-selected="false" hidden></button>
 </nav>
 <div id="toast" role="status"></div>
 
@@ -103,38 +115,50 @@ nav{display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;justify-content:center}
   <div class="ex"><div class="tile">F</div><div class="tile">L</div><div class="tile">A</div><div class="tile absent">M</div><div class="tile">E</div></div>
   <p>M is not in the word at all (dark).</p>
   <p>Letters can repeat. A letter is only colored as many times as it appears in the word.</p>
-  <p>Find the word and a new tab opens where you can enter the prize draw. You can also share your result as colored squares.</p>
+  <p>Find the word and you can enter the prize draw right away. You can also share your result to your Instagram story.</p>
   <button class="btn" id="startBtn">Start playing</button>
 </section>
 
 <div id="play" hidden>
   <main id="board" aria-label="Game board"></main>
-  <div id="end"></div>
-  <div id="kb"></div>
-</div>
-
-<section id="entry" hidden>
-  <h2 id="entryTitle"></h2>
-  <p id="entryIntro"></p>
-  <div class="card">
+  <section class="card entry" id="entryCard" hidden>
+    <h2 id="entryTitle"></h2>
+    <p id="entryIntro"></p>
     <div id="entryFields"></div>
     <p id="consent" style="font-size:.8rem"></p>
     <button class="btn" id="entrySubmit">Enter the draw</button>
     <div class="msg" id="entryMsg" role="status"></div>
+  </section>
+  <div id="end"></div>
+  <div id="kb"></div>
+</div>
+
+<div class="overlay" id="igPanel" role="dialog" aria-modal="true" aria-label="Share to IG" hidden>
+  <div class="sheet">
+    <h2>Share to IG</h2>
+    <div class="chk"><canvas id="igCanvas"></canvas></div>
+    <p class="hint" id="igHint"></p>
+    <div class="btns">
+      <label class="btn alt" for="bgPhoto">Take background photo</label>
+      <input type="file" id="bgPhoto" accept="image/*" capture="environment" hidden>
+      <button class="btn alt" id="bgClear" hidden>Transparent</button>
+      <button class="btn" id="igShare">Share</button>
+      <button class="btn alt" id="igSave">Save image</button>
+      <button class="btn alt" id="igClose">Close</button>
+    </div>
   </div>
-</section>
+</div>
 
 <script src="config.js"></script>
 <script>
 const L = CONFIG.wordLength, N = CONFIG.maxGuesses;
 const WORDS = CONFIG.words.map(w => w.toUpperCase()).filter(w => w.length === L);
 const $ = id => document.getElementById(id);
-let secret, row, col, grid, over, colors, shareRows = [];
+let secret, row, col, grid, over, colors, shareRows = [], bgImg = null;
 
 /* ---------- setup ---------- */
 document.title = CONFIG.title;
 $("title").textContent = CONFIG.title;
-$("tabEntry").textContent = CONFIG.entryTabLabel;
 $("entryTitle").textContent = CONFIG.entryTitle;
 $("entryIntro").textContent = CONFIG.entryIntro;
 $("consent").textContent = CONFIG.consent;
@@ -153,15 +177,13 @@ function toast(msg, ms = 1500){
 
 /* ---------- tabs ---------- */
 function showTab(t){
-  ["welcome","play","entry"].forEach(n => $(n).hidden = n !== t);
+  $("welcome").hidden = t !== "welcome"; $("play").hidden = t !== "play";
   $("tabWelcome").setAttribute("aria-selected", String(t === "welcome"));
   $("tabPlay").setAttribute("aria-selected", String(t === "play"));
-  $("tabEntry").setAttribute("aria-selected", String(t === "entry"));
 }
 $("tabWelcome").onclick = () => showTab("welcome");
 $("startBtn").onclick = () => showTab("play");
 $("tabPlay").onclick = () => showTab("play");
-$("tabEntry").onclick = () => showTab("entry");
 
 /* ---------- board ---------- */
 function build(){
@@ -188,9 +210,11 @@ function mkKey(label, val, wide){
   return k;
 }
 function newGame(random){
-  secret = pickWord(random); row = 0; col = 0; over = false;
+  secret = pickWord(random); row = 0; col = 0; over = false; bgImg = null;
   grid = Array.from({length:N}, () => Array(L).fill(""));
-  colors = {}; shareRows = []; build(); $("end").innerHTML = "";
+  colors = {}; shareRows = []; build();
+  $("end").innerHTML = ""; $("entryCard").hidden = true; $("kb").hidden = false;
+  $("entrySubmit").disabled = false; msg("");
 }
 const tile = (r, c) => $("board").children[r].children[c];
 
@@ -238,39 +262,23 @@ function submit(){
     });
     if (!done) return;
     toast(hasWon ? CONFIG.winMessages[thisRow % CONFIG.winMessages.length] : secret, 4000);
+    $("kb").hidden = true;
     const end = $("end"); end.innerHTML = "";
-    const add = (label, fn) => { const b = document.createElement("button"); b.className = "btn"; b.textContent = label; b.onclick = fn; end.appendChild(b); };
-    if (hasWon){ $("tabEntry").hidden = false; add("Enter the lantern draw", () => showTab("entry")); }
-    add("Share results", shareResults);
-    add("Play again", () => newGame(true));
+    const add = (label, fn, alt) => { const b = document.createElement("button"); b.className = "btn" + (alt ? " alt" : ""); b.textContent = label; b.onclick = fn; end.appendChild(b); };
+    add("Share to IG", openIg);
+    add("Play again", () => newGame(true), true);
+    if (hasWon) showEntry();
   }, L * 250 + 300);
 }
 document.addEventListener("keydown", e => {
-  if (e.ctrlKey || e.metaKey || e.altKey || $("play").hidden) return;
+  if (e.key === "Escape" && !$("igPanel").hidden){ closeIg(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey || $("play").hidden || !$("igPanel").hidden) return;
+  if (["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) return;
   if (e.key === "Enter" && document.activeElement.tagName === "BUTTON") return;
   if (e.key === "Enter" || e.key === "Backspace" || /^[a-zA-Z]$/.test(e.key)) handle(e.key);
 });
 
-/* ---------- share results as emoji squares ---------- */
-function shareText(){
-  const m = {correct:"\uD83D\uDFE8", present:"\uD83D\uDFEA", absent:"\u2B1B"};
-  const last = shareRows[shareRows.length - 1];
-  const sc = last && last.every(s => s === "correct") ? shareRows.length : "X";
-  return CONFIG.title + " " + sc + "/" + N + "\n\n" + shareRows.map(r => r.map(s => m[s]).join("")).join("\n");
-}
-async function shareResults(){
-  const text = shareText();
-  try { if (navigator.share){ await navigator.share({text}); return; } }
-  catch (e){ if (e && e.name === "AbortError") return; }
-  try { await navigator.clipboard.writeText(text); toast("Results copied"); }
-  catch (e){
-    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
-    let ok = false; try { ok = document.execCommand("copy"); } catch (_){}
-    ta.remove(); toast(ok ? "Results copied" : "Couldn't copy results");
-  }
-}
-
-/* ---------- prize draw entry (saved to your Google Sheet) ---------- */
+/* ---------- prize draw entry: appears right after a win ---------- */
 CONFIG.entryFields.forEach(f => {
   const l = document.createElement("label"); l.className = "field"; l.textContent = f.label;
   const i = document.createElement("input"); i.type = f.type; i.id = "f_" + f.key; i.maxLength = 120;
@@ -278,8 +286,11 @@ CONFIG.entryFields.forEach(f => {
 });
 function msg(t, bad){ const m = $("entryMsg"); m.textContent = t; m.className = "msg" + (bad ? " err" : ""); }
 function lockEntry(){ $("entrySubmit").disabled = true; msg("You're in! Good luck. We'll contact you if you win."); }
-try { if (localStorage.getItem("wordled-entered")) lockEntry(); } catch (e){}
-
+function showEntry(){
+  $("entryCard").hidden = false;
+  try { if (localStorage.getItem("wordled-entered")) lockEntry(); } catch (e){}
+  $("entryCard").scrollIntoView({behavior:"smooth", block:"center"});
+}
 $("entrySubmit").onclick = async () => {
   if (!CONFIG.entryEndpoint){ msg("The prize draw isn't set up yet.", true); return; }
   const data = {};
@@ -290,6 +301,7 @@ $("entrySubmit").onclick = async () => {
     data[f.key] = v;
   }
   data.word = secret;
+  if (CONFIG.entryEndpoint === "demo"){ msg("Demo preview: this entry wasn't saved. On the live site it goes to your Google Sheet."); return; }
   $("entrySubmit").disabled = true; msg("Saving...");
   try {
     const r = await fetch(CONFIG.entryEndpoint, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data)});
@@ -300,6 +312,65 @@ $("entrySubmit").onclick = async () => {
   } catch (e){
     $("entrySubmit").disabled = false; msg("Couldn't save your entry. Please try again.", true);
   }
+};
+
+/* ---------- Share to IG: transparent PNG, optional photo background ---------- */
+const TILE_COLORS = {correct:"#f2b632", present:"#9b6fd6", absent:"#2b2350"};
+function rrect(ctx, x, y, w, h, r){ ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); }
+function render(){
+  const n = shareRows.length, last = shareRows[n - 1];
+  const sc = last && last.every(s => s === "correct") ? n : "X";
+  const T = 120, G = 14, gw = L * T + (L - 1) * G, gh = n * T + (n - 1) * G;
+  const photo = !!bgImg, W = photo ? 1080 : gw + 120, H = photo ? 1920 : gh + 300;
+  const gx = (W - gw) / 2, gy = photo ? (H - gh) / 2 + 70 : 210;
+  const c = $("igCanvas"); c.width = W; c.height = H;
+  const ctx = c.getContext("2d"); ctx.clearRect(0, 0, W, H);
+  if (photo){
+    const s = Math.max(W / bgImg.width, H / bgImg.height), iw = bgImg.width * s, ih = bgImg.height * s;
+    ctx.drawImage(bgImg, (W - iw) / 2, (H - ih) / 2, iw, ih);
+  }
+  ctx.textAlign = "center"; ctx.fillStyle = TILE_COLORS.correct;
+  ctx.shadowColor = "rgba(0,0,0,.65)"; ctx.shadowBlur = 14;
+  ctx.font = '700 84px "Cormorant Garamond",Georgia,serif';
+  ctx.fillText(CONFIG.title + "  " + sc + "/" + N, W / 2, gy - 70);
+  shareRows.forEach((r, ri) => r.forEach((s, ci) => {
+    const x = gx + ci * (T + G), y = gy + ri * (T + G);
+    ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = 10;
+    rrect(ctx, x, y, T, T, 18); ctx.fillStyle = TILE_COLORS[s]; ctx.fill();
+    ctx.shadowBlur = 0; ctx.lineWidth = 4; ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.stroke();
+  }));
+  $("bgClear").hidden = !photo;
+  $("igHint").textContent = photo
+    ? "Your photo is the background. Share it, or save it and post it as a story."
+    : "This is a transparent PNG. Save it, then add it to an Instagram story as a photo sticker, or take a photo to use as the background.";
+}
+async function openIg(){
+  try { if (document.fonts) await document.fonts.load('700 84px "Cormorant Garamond"'); } catch (e){}
+  render(); $("igPanel").hidden = false; $("igShare").focus();
+}
+function closeIg(){ $("igPanel").hidden = true; }
+$("igClose").onclick = closeIg;
+$("bgClear").onclick = () => { bgImg = null; $("bgPhoto").value = ""; render(); };
+$("bgPhoto").onchange = e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  const img = new Image(), url = URL.createObjectURL(f);
+  img.onload = () => { bgImg = img; render(); URL.revokeObjectURL(url); };
+  img.onerror = () => { toast("Couldn't load that photo"); URL.revokeObjectURL(url); };
+  img.src = url;
+};
+const getBlob = () => new Promise(r => $("igCanvas").toBlob(r, "image/png"));
+async function saveImage(b){
+  try { if (window.claude){ const d = await claude.use("downloads"); if (d){ await d.save({filename:"wordled.png", data:b}); return; } } } catch (e){}
+  const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "wordled.png";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+$("igSave").onclick = async () => { await saveImage(await getBlob()); toast("Image saved"); };
+$("igShare").onclick = async () => {
+  const b = await getBlob(), f = new File([b], "wordled.png", {type:"image/png"});
+  try {
+    if (navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); return; }
+  } catch (e){ if (e && e.name === "AbortError") return; }
+  await saveImage(b); toast("Image saved. Open Instagram and add it to your story.", 3500);
 };
 
 newGame(false);
