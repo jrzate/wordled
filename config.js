@@ -22,11 +22,11 @@ const CONFIG = {
 
   entryTabLabel: "Lantern Draw",
   entryTitle: "You found the light!",
-  entryIntro: "Leave your details to enter the lantern draw. One entry per email.",
+  entryIntro: "Leave your details to enter the raffle for vouchers and prizes. One entry per person.",
   consent: "By entering, you agree to be contacted if you win.",
   // Keys name, email and contact are saved to the sheet's columns.
   entryFields: [
-    {key:"name",    label:"Name",  type:"text",  required:true},
+    {key:"name",    label:"Name (Last Name, First Name)",  type:"text",  required:true},
     {key:"email",   label:"UP Mail", type:"email", required:true},
     {key:"contact", label:"FB Name or IG handle", type:"text", required:true}
   ]
